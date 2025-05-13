@@ -1,0 +1,12 @@
+bin/
+.idea/
+dist/
+postgres-data/
+tmp/
+dist/api
+.DS_Store
+.vscode
+coverage.out
+.env
+volumes/
+coverage.out

@@ -1,0 +1,3 @@
+CREATE INDEX idx_transactions_initiator_wallet_id ON crypto.transactions(initiator_wallet_id);
+CREATE INDEX idx_transactions_recipient_wallet_id ON crypto.transactions(recipient_wallet_id);
+CREATE INDEX idx_transactions_created_at ON crypto.transactions(created_at DESC);

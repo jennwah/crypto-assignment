@@ -1,0 +1,306 @@
+definitions:
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  wallet.DepositWalletRequest:
+    properties:
+      amount:
+        type: integer
+    required:
+    - amount
+    type: object
+  wallet.DepositWalletResponse:
+    properties:
+      transaction_id:
+        type: string
+    type: object
+  wallet.GetWalletResponse:
+    properties:
+      balance:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  wallet.GetWalletTransactionResponse:
+    properties:
+      amount:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      initiator_wallet_user_id:
+        type: string
+      recipient_wallet_user_id:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  wallet.GetWalletTransactionsHistoryResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      transactions:
+        items:
+          $ref: '#/definitions/wallet.GetWalletTransactionResponse'
+        type: array
+    type: object
+  wallet.TransferRequest:
+    properties:
+      amount:
+        type: integer
+      recipient_user_id:
+        type: string
+    required:
+    - amount
+    - recipient_user_id
+    type: object
+  wallet.TransferResponse:
+    properties:
+      transaction_id:
+        type: string
+    type: object
+  wallet.WithdrawWalletRequest:
+    properties:
+      amount:
+        type: integer
+    required:
+    - amount
+    type: object
+  wallet.WithdrawWalletResponse:
+    properties:
+      transaction_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/wallet:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the wallet details of the current user
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: X-USER-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wallet.GetWalletResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get wallet
+      tags:
+      - Wallet
+  /api/v1/wallet/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposit a specific amount (in cents) to the user's wallet
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: X-USER-ID
+        required: true
+        type: string
+      - description: Idempotency Key (UUID)
+        in: header
+        name: X-IDEMPOTENCY-KEY
+        required: true
+        type: string
+      - description: Deposit amount in cents
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.DepositWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wallet.DepositWalletResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Deposit to wallet
+      tags:
+      - Wallet
+  /api/v1/wallet/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the wallet transactions history of the user
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: X-USER-ID
+        required: true
+        type: string
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page (default is 10)
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wallet.GetWalletTransactionsHistoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get wallet transactions history
+      tags:
+      - Wallet
+  /api/v1/wallet/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfers money from the initiator user to the recipient user.
+      parameters:
+      - description: Initiator's User ID (UUID)
+        in: header
+        name: X-USER-ID
+        required: true
+        type: string
+      - description: Idempotency Key (UUID)
+        in: header
+        name: X-IDEMPOTENCY-KEY
+        required: true
+        type: string
+      - description: Transfer request payload
+        in: body
+        name: transferRequest
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.TransferRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wallet.TransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Transfer money to another user
+      tags:
+      - Wallet
+  /api/v1/wallet/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Withdraw a specific amount (in cents) from the user's wallet
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: X-USER-ID
+        required: true
+        type: string
+      - description: Idempotency Key (UUID)
+        in: header
+        name: X-IDEMPOTENCY-KEY
+        required: true
+        type: string
+      - description: Withdraw amount in cents
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.WithdrawWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wallet.WithdrawWalletResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Withdraw from wallet
+      tags:
+      - Wallet
+swagger: "2.0"
