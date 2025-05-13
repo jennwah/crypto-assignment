@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is an API service written in <bold>Go</bold>, coupled with <bold>Gin</bold> framework with <bold>Docker</bold> setup. All APIs documentation are defined and generated with <bold>OpenAPI specs 3.0 swagger</bold> tools.
+This is an API service written in <b>Go</b>, coupled with <b>Gin</b> framework with <b>Docker</b> setup. All APIs documentation are defined and generated with <b>OpenAPI specs 3.0 swagger</b> tools.
 
 For the purpose of the assignment, it's decided that, to support all functional requiremenets (user stories required in assignment) with the APIs required, this wallet will only deal with wallet-related operations, `(get balance, deposit, withdraw, transfer & transactions history retrieval)`. Only `user_id` is stored on our wallet service for relation with users. It's best to keep user-related functionalities such as user profile details, user auth etc in another service for clear responsibility segregation between two domains.
 
@@ -23,7 +23,7 @@ At its core, this API service serves as the source of truth for all user wallets
 
 We use PostgreSQL database for primary storage for its ACID properties and transactions capabilities to commit or rollback atomic transactions. We also utilize PostgreSQL's MVCC architecture such as using row-level locking capabilities to allow concurrent reads while making sure we are able to lock certain rows for updates purposes. 
 
-As network is always unreliable, all of our POST APIs (deposit, withdraw or transfer APIs, which are required to processed <bold>exactly once</bold> by our service) are built with idempotency design to allow for safe retries. As such, callers will need to provide idempotency keys as part of request header `X-IDEMPOTENCY-KEY` and we cache these keys in Redis (with <bold>TTL: 24 hours</bold>) to deduplicate identical requests. TTL of 24 hours is chosen as a balanced trade off between storage and business requirements 
+As network is always unreliable, all of our POST APIs (deposit, withdraw or transfer APIs, which are required to processed <b>exactly once</b> by our service) are built with idempotency design to allow for safe retries. As such, callers will need to provide idempotency keys as part of request header `X-IDEMPOTENCY-KEY` and we cache these keys in Redis (with <b>TTL: 24 hours</b>) to deduplicate identical requests. TTL of 24 hours is chosen as a balanced trade off between storage and business requirements 
 
 Here we include a simple diagram to demonstrate our high-level system overview:
 
@@ -39,9 +39,9 @@ Our wallet service stores money in cents unit to ensure precision and avoid prob
 
 For a more interactive experience, you can refer to `http://localhost:8080/swagger/index.html` for swagger API tool.
 
-All APIs provide querying, depositing, withdrawing or transfering wallets' balances with `X-USER-ID` header as well as some APIs (which must be processed <bold>exactly once</bold> eg: POST requests) with `X-IDEMPOTENCY-KEY` header.
+All APIs provide querying, depositing, withdrawing or transfering wallets' balances with `X-USER-ID` header as well as some APIs (which must be processed <b>exactly once</b> eg: POST requests) with `X-IDEMPOTENCY-KEY` header.
 
-Our APIs also follow the <bold>Restful</bold> design with appriopriate <bold>status codes</bold>, <bold>JSON responses</bold> and <bold>versioning</bold> for robust API designs.
+Our APIs also follow the <b>Restful</b> design with appriopriate <b>status codes</b>, <b>JSON responses</b> and <b>versioning</b> for robust API designs.
 
 Here we will briefly go through some key points of the APIs;
 
@@ -246,9 +246,9 @@ We use row-level locking `SELECT ... FOR UPDATE` on certain transactions such as
 
 ## Redis Design
 
-Redis is used mainly for caching idempotency keys. Each API calls for deposit, withdraw or transfer is an operation that must be idempotent (processed <bold>exactly once</bold>) in nature. As such, callers must supply UUID idempotency key for each operations for safe retries in case server returns errors that are server-side or unidentifiable due to the unstable nature of network.  
+Redis is used mainly for caching idempotency keys. Each API calls for deposit, withdraw or transfer is an operation that must be idempotent (processed <b>exactly once</b>) in nature. As such, callers must supply UUID idempotency key for each operations for safe retries in case server returns errors that are server-side or unidentifiable due to the unstable nature of network.  
 
-Internally, our API service takes each idempotency UUID key and checks if it exists in Redis, if it does it means the operation has already succeeded, we just return the cached transaction ID without doing anything. If not, proceed with the operation and cache the key with <bold>TTL of 24 hours</bold> to avoid double processing in future.
+Internally, our API service takes each idempotency UUID key and checks if it exists in Redis, if it does it means the operation has already succeeded, we just return the cached transaction ID without doing anything. If not, proceed with the operation and cache the key with <b>TTL of 24 hours</b> to avoid double processing in future.
 
 Some examples of idempotency keys caching in wallet service;
 1. `deposit-userID-idempotencyKey`
@@ -261,7 +261,7 @@ Unit tests are added at domain, service and repository layers where most busines
 
 We use `gomock` for mocking dependencies at different layers. Run `go install github.com/golang/mock/mockgen@v1.6.0` to get mockgen binary. You can find details usage at https://github.com/golang/mock.
 
-Run `make unit_test` to run the entire unit tests suites. Our unit tests are written in <bold>table-driven format</bold> as recommended by Golang community https://go.dev/wiki/TableDrivenTests.
+Run `make unit_test` to run the entire unit tests suites. Our unit tests are written in <b>table-driven format</b> as recommended by Golang community https://go.dev/wiki/TableDrivenTests.
 
 To see visualization for each file on unit test coverage, run `make unit_test_vis`.
 
